@@ -1,15 +1,23 @@
-﻿# CMakeList.txt : Top-level CMake project file, do global configuration
-# and include sub-projects here.
-#
-cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required(VERSION 3.11)
+# Require modern C++
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Enable Hot Reload for MSVC compilers if supported.
-if (POLICY CMP0141)
-  cmake_policy(SET CMP0141 NEW)
-  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
-endif()
+project(GameEng)
 
-project ("GameEng")
+#### Setup Directories ####
+#Main output directory
+SET(OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")
+# Ouput all DLLs from all libs into main build folder
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIRECTORY})
 
-# Include sub-projects.
-add_subdirectory ("GameEng")
+#### Add External Dependencies ####
+add_subdirectory("lib/sfml")
+set(SFML_INCS "lib/sfml/include")
+link_directories("${CMAKE_BINARY_DIR}/lib/sfml/lib")
+
+#### Practical 1 ####
+file(GLOB_RECURSE SOURCES GameEng/*.cpp GameEng/*.h)
+add_executable(GameEng ${SOURCES})
+target_include_directories(GameEng PRIVATE ${SFML_INCS})
+target_link_libraries(GameEng sfml-graphics)
