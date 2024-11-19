@@ -1,4 +1,5 @@
-﻿cmake_minimum_required(VERSION 3.11)
+﻿# CMakeLists.txt
+cmake_minimum_required(VERSION 3.11)
 # Require modern C++
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -21,3 +22,15 @@ file(GLOB_RECURSE SOURCES GameEng/*.cpp GameEng/*.h)
 add_executable(GameEng ${SOURCES})
 target_include_directories(GameEng PRIVATE ${SFML_INCS})
 target_link_libraries(GameEng sfml-graphics)
+
+set_target_properties(GameEng 
+    PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)
+)
+add_dependencies(GameEng copy_resources)
+
+add_custom_target(copy_resources ALL COMMAND ${CMAKE_COMMAND} 
+  -E copy_directory
+    "${PROJECT_SOURCE_DIR}/res"
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/res
+)
