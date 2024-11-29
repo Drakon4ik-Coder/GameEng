@@ -1,33 +1,24 @@
 ﻿// GameEng.cpp : Defines the entry point for the application.
 //
 
-#include "Ship.h"
-#include "Bullet.h"
+#include "Player.h"
 #include "GameEng.h"
+#include "LevelSystem.h"
 
-sf::Texture spritesheet;
-std::vector<Ship *> ships;
+std::unique_ptr<Player> player;
 
 void Load()
 {
-    if (!spritesheet.loadFromFile("res/img/invaders_sheet.png"))
-    {
-        cerr << "Failed to load spritesheet!" << std::endl;
-    }
-    int offsetX = (gameWidth-32*invaders_columns)/2;
-    for (int r = 0; r < invaders_rows; ++r)
-    {
-        auto rect = IntRect(Vector2i(0, 0), Vector2i(32, 32));
-        for (int c = 0; c < invaders_columns; ++c)
-        {
-            Vector2f position = {c * 32 + offsetX, r * 32 + 16};
-            auto inv = new Invader(rect, position);
-            ships.push_back(inv);
+    player = std::make_unique<Player>();
+    ls::loadLevelFile("res/levels/maze.txt");
+
+    // Print the level to the console
+    for (size_t y = 0; y < ls::getHeight(); ++y) {
+        for (size_t x = 0; x < ls::getWidth(); ++x) {
+        cout << ls::getTile({x, y});
         }
+        cout << endl;
     }
-    auto player = new Player();
-    ships.push_back(player);
-    Bullet::Init();
 }
 void Update(RenderWindow &window)
 {
@@ -47,20 +38,14 @@ void Update(RenderWindow &window)
         window.close();
     }
 
-    for (auto &s : ships)
-    {
-        s->Update(dt);
-    }
-    Bullet::Update(dt);
+    (*player).Update(dt);
 }
 void Render(RenderWindow &window)
 {
-    for (const auto s : ships)
-    {
-        window.draw(*s);
-    }
-    Bullet::Render(window);
+    ls::Render(window);
+    (*player).Render(window);
 }
+
 
 int main()
 {

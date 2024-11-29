@@ -17,11 +17,24 @@ add_subdirectory("lib/sfml")
 set(SFML_INCS "lib/sfml/include")
 link_directories("${CMAKE_BINARY_DIR}/lib/sfml/lib")
 
+## Tile loader lib
+file(GLOB_RECURSE SOURCE_FILES lib_tile_level_loader/*.cpp lib_tile_level_loader/*.h)
+add_library(lib_tile_level_loader STATIC ${SOURCE_FILES})
+target_include_directories(lib_tile_level_loader INTERFACE "${CMAKE_SOURCE_DIR}/lib_tile_level_loader/" )
+target_link_libraries(lib_tile_level_loader sfml-graphics)
+
+# Maths lib
+add_library(lib_math INTERFACE)
+target_sources(lib_math INTERFACE "${CMAKE_SOURCE_DIR}/lib_math/Math.h")
+target_include_directories(lib_math INTERFACE "${CMAKE_SOURCE_DIR}/lib_math" SYSTEM INTERFACE ${SFML_INCS})
+
+
+
 #### Practical 1 ####
 file(GLOB_RECURSE SOURCES GameEng/*.cpp GameEng/*.h)
 add_executable(GameEng ${SOURCES})
 target_include_directories(GameEng PRIVATE ${SFML_INCS})
-target_link_libraries(GameEng sfml-graphics)
+target_link_libraries(GameEng lib_tile_level_loader lib_math sfml-graphics)
 
 set_target_properties(GameEng 
     PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY
@@ -34,3 +47,5 @@ add_custom_target(copy_resources ALL COMMAND ${CMAKE_COMMAND}
     "${PROJECT_SOURCE_DIR}/res"
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/res
 )
+
+
